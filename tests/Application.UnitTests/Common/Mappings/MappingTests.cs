@@ -1,32 +1,36 @@
 ﻿using AutoMapper;
-using CleanArchitecture.Application.TodoItems.Queries.GetTodoItem;
-using CleanArchitecture.Application.TodoItems.Queries.GetTodoItemsList;
+using CleanArchitecture.Application.Common.Mappings;
+using CleanArchitecture.Application.TodoLists.Queries.GetTodos;
 using CleanArchitecture.Domain.Entities;
+using NUnit.Framework;
 using System;
-using Xunit;
 
 namespace CleanArchitecture.Application.UnitTests.Common.Mappings
 {
-    public class MappingTests : IClassFixture<MappingTestsFixture>
+    public class MappingTests
     {
         private readonly IConfigurationProvider _configuration;
         private readonly IMapper _mapper;
 
-        public MappingTests(MappingTestsFixture fixture)
+        public MappingTests()
         {
-            _configuration = fixture.ConfigurationProvider;
-            _mapper = fixture.Mapper;
+            _configuration = new MapperConfiguration(cfg =>
+            {
+                cfg.AddProfile<MappingProfile>();
+            });
+
+            _mapper = _configuration.CreateMapper();
         }
 
-        [Fact]
+        [Test]
         public void ShouldHaveValidConfiguration()
         {
             _configuration.AssertConfigurationIsValid();
         }
         
-        [Theory]
-        [InlineData(typeof(TodoItem), typeof(TodoItemDto))]
-        [InlineData(typeof(TodoItem), typeof(TodoItemVm))]
+        [Test]
+        [TestCase(typeof(TodoList), typeof(TodoListDto))]
+        [TestCase(typeof(TodoItem), typeof(TodoItemDto))]
         public void ShouldSupportMappingFromSourceToDestination(Type source, Type destination)
         {
             var instance = Activator.CreateInstance(source);
